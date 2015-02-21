@@ -26,6 +26,9 @@ A brief list and description of the important project files:
 
 Demo
 ----
+Demo page for map editor with basic import/export functionality.
+[Map Editor Demo](http://yungsippin.com/hexpixi/pb_mapeditor.html)
+
 Here is a demo page with a basic map generator on it.
 [Map Generator Demo](http://yungsippin.com/hexpixi/)
 
