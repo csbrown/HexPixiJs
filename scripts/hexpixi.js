@@ -2,7 +2,7 @@
 /// <reference path="vend/pixi.dev.js" />
 /* 
     HexPixi (alpha)
-    Version 0.30
+    Version 0.40
     by Mark Harmon 2014
     A free hex game library for pixijs.
     Released under MIT License. 
@@ -63,6 +63,14 @@
             self.inner = null; // If a non-textured cell then this is the PIXI.Graphics of the hex inner.
             self.hex = null; // The parent container of the hex's graphics objects.
         };
+
+        self.toJSON = function () {
+            return {
+                row: self.row,
+                column: self.column,
+                terrainIndex: self.terrainIndex
+            };
+        };
     };
 
     // Scene graph heirarchy = pixiState -> container -> hexes
@@ -97,7 +105,7 @@
                 // This is the pixel height specifying an area of overlap for hex cells. Necessary when
                 // working with isometric view art systems.
                 hexBottomPad: 0,
-                onAssetsLoaded: function(){}
+                onAssetsLoaded: function () { }
             };
 
         self.textures = [];
@@ -139,7 +147,7 @@
                 points.push(new PIXI.Point(x, y));
             }
 
-            console.log(points);
+            //console.log(points);
 
             return new PIXI.Polygon(points);
         }
@@ -168,10 +176,10 @@
                 graphics.beginFill(color, 1);
             }
 
-            graphics.moveTo(cell.poly.points[i], cell.poly.points[i+1]);
+            graphics.moveTo(cell.poly.points[i], cell.poly.points[i + 1]);
 
             for (i = 2; i < cell.poly.points.length; i += 2) {
-                graphics.lineTo(cell.poly.points[i], cell.poly.points[i+1]);
+                graphics.lineTo(cell.poly.points[i], cell.poly.points[i + 1]);
             }
 
             if (hasFill !== false) {
@@ -504,6 +512,64 @@
             }
         }
 
+        self.importMap = function (exportedMap) {
+            var newOptions = {
+                mapHeight: exportedMap.mapHeight,
+                mapWidth: exportedMap.mapWidth,
+                coordinateSystem: exportedMap.coordinateSystem,
+                hexLineWidth: exportedMap.hexLineWidth,
+                hexLineColor: exportedMap.hexLineColor,
+                hexWidth: exportedMap.hexWidth,
+                hexHeight: exportedMap.hexHeight,
+                hexBottomPad: exportedMap.hexBottomPad,
+                showCoordinates: exportedMap.showCoordinates,
+                // MLH: Here is a tricky problem, but we can solve with unique namespaces.
+                //onHexClick: onHexClick,
+                textures: JSON.parse(exportedMap.textures),
+                terrainTypes: JSON.parse(exportedMap.terrainTypes)                
+            };
+
+            self.reset(newOptions);
+
+            exportedMap.cells = JSON.parse(exportedMap.cells);
+
+            for (var row = 0; row < self.options.mapHeight; row++) {
+                self.cells.push([]);
+                for (var column = 0; column < self.options.mapWidth; column += 2) {
+                    var exportedCell = exportedMap.cells[row][column];
+                    var cell = new hp.Cell(exportedCell.row, exportedCell.column, exportedCell.terrainIndex);
+                    self.cells[cell.row].push(cell);
+                }
+                for (var column = 1; column < self.options.mapWidth; column += 2) {
+                    var exportedCell = exportedMap.cells[row][column];
+                    var cell = new hp.Cell(exportedCell.row, exportedCell.column, exportedCell.terrainIndex);
+                    self.cells[cell.row].push(cell);
+                }
+            }
+
+            createSceneGraph();
+        };
+
+        self.exportMap = function () {
+            var result = {
+                mapHeight: self.options.mapHeight,
+                mapWidth: self.options.mapWidth,
+                coordinateSystem: self.options.coordinateSystem,
+                hexLineWidth: self.options.hexLineWidth,
+                hexLineColor: self.options.hexLineColor,
+                hexWidth: self.options.hexWidth,
+                hexHeight: self.options.hexHeight,
+                hexBottomPad: self.options.hexBottomPad,
+                showCoordinates: self.options.showCoordinates,
+                // MLH: Here is a tricky problem, but we can solve with unique namespaces.
+                //onHexClick: onHexClick,
+                textures: JSON.stringify(self.options.textures),
+                terrainTypes: JSON.stringify(self.options.terrainTypes),
+                cells: JSON.stringify(self.cells)
+            };
+            return result;
+        };
+
         self.generateRandomMap = function () {
             for (var row = 0; row < self.options.mapHeight; row++) {
                 self.cells.push([]);
@@ -512,7 +578,7 @@
                     var cell = new hp.Cell(row, column, rnd);
                     self.cells[cell.row].push(cell);
                 }
-                for (var column = 1; column < self.options.mapWidth; column+=2) {
+                for (var column = 1; column < self.options.mapWidth; column += 2) {
                     var rnd = Math.floor((Math.random() * self.options.terrainTypes.length));
                     var cell = new hp.Cell(row, column, rnd);
                     self.cells[cell.row].push(cell);
@@ -524,11 +590,11 @@
         self.generateBlankMap = function () {
             for (var row = 0; row < self.options.mapHeight; row++) {
                 self.cells.push([]);
-                for (var column = 0; column < self.options.mapWidth; column+=2) {
+                for (var column = 0; column < self.options.mapWidth; column += 2) {
                     var cell = new hp.Cell(row, column, 0);
                     self.cells[cell.row].push(cell);
                 }
-                for (var column = 1; column < self.options.mapWidth; column+=2) {
+                for (var column = 1; column < self.options.mapWidth; column += 2) {
                     var cell = new hp.Cell(row, column, 0);
                     self.cells[cell.row].push(cell);
                 }
@@ -585,7 +651,6 @@
 
             // Setup cell hilighter
             var cell = new hp.Cell(0, 0, 0);
-
             cell.poly = createHexPoly();
             var chg = createDrawHex_internal(cell, true, false);
             if (chg) {
