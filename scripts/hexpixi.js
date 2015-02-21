@@ -26,12 +26,14 @@
             map = amap;
 
         function updateSceneGraph() {
+            map.container.position.x = position.x;
+            map.container.position.y = position.y;
         }
 
         self.position = function (x, y) {
             var result = position;
 
-            if (x >= 0 && y >= 0) {
+            if (x && y) {
                 position.x = x;
                 position.y = y;
                 updateSceneGraph();
@@ -104,6 +106,7 @@
         self.pixiStage = null;
         self.options = null;
         self.cells = [];
+        self.camera = new hp.Camera(self);
         self.cellHighlighter = null;
         self.inCellCount = 0;
         self.hexAxis = { x: 0, y: 0 };
@@ -414,13 +417,13 @@
 
             hex.click = function (data) {
                 if (self.options.onHexClick) {
-                    self.options.onHexClick(data.target.p_cell);
+                    self.options.onHexClick(data.target.p_cell, data);
                 }
             }
 
             hex.tap = function (data) {
                 if (self.options.onHexClick) {
-                    self.options.onHexClick(data.target.p_cell);
+                    self.options.onHexClick(data.target.p_cell, data);
                 }
             }
 

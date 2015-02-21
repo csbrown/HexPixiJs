@@ -25,7 +25,7 @@
             hexLineWidth: 2,
             hexSize: 40,
             showCoordinates: true,
-            textures: ["images/game/grassTexture.jpg", "images/game/waterTexture.jpg"],
+            textures: ["images/game/texture/grassTexture.jpg", "images/game/texture/waterTexture.jpg"],
             terrainTypes: [
                 { name: "dirt", color: 0x9B5523 },
                 { name: "sand", color: 0xdBd588 },

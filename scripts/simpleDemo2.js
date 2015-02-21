@@ -11,8 +11,10 @@
             resolution: 1
         });
 
-    function onHexClick(cell) {
+    function onHexClick(cell, data) {
         map.setCellTerrainType(cell, 0);
+        //map.camera.position(-cell.center.x+30, -cell.center.y+30);
+        //console.log(map.camera.position());
     }
 
     function animate() {
@@ -23,8 +25,8 @@
 
     function getOptions() {
         return {
-            mapWidth: 10,
-            mapHeight: 8,
+            mapWidth: 30,
+            mapHeight: 30,
             coordinateSystem: 2,
             hexLineWidth: 2,
             hexLineColor: 0xd0d0d0,
@@ -33,12 +35,12 @@
             hexBottomPad: 24,
             onHexClick: onHexClick,
             textures: [
-                "images/game/tileGrass.png",
-                "images/game/tileSand.png",
-                "images/game/tileDirt.png",
-                "images/game/tileRock.png",
-                "images/game/tileSnow.png",
-                "images/game/tileWater.png"
+                "images/game/tile/tileGrass.png",
+                "images/game/tile/tileSand.png",
+                "images/game/tile/tileDirt.png",
+                "images/game/tile/tileRock.png",
+                "images/game/tile/tileSnow.png",
+                "images/game/tile/tileWater.png"
             ],
             terrainTypes: [
                 { name: "empty", color: 0xffffff, isEmpty: true },
