@@ -48,4 +48,6 @@ Credits
 
 Art assets for simple demo 2 by [Kenney](http://opengameart.org/users/kenney)
 
+A great article called [Hexagonal Grids by Red Blob Games](http://www.redblobgames.com/grids/hexagons/).
+
 Feel free to submit contributions.
