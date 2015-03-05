@@ -1,6 +1,6 @@
 HexPixiJs
 =========
-Basic Hex Grid For PixiJS. Version 0.40 (alpha).
+Basic Hex Grid For PixiJS. Version 0.41 (alpha).
 
 HexPixiJs is a simple library written to give hex grid based game developers a jump start. This library will be updated periodically but there is currently no roadmap of features. Feel free to request features.
 

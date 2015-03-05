@@ -2,8 +2,8 @@
 /// <reference path="vend/pixi.dev.js" />
 /* 
     HexPixi (alpha)
-    Version 0.40
-    by Mark Harmon 2014
+    Version 0.41
+    by Mark Harmon 2015
     A free hex game library for pixijs.
     Released under MIT License. 
     Please let me know about any games released using this library or derivative work.
@@ -43,6 +43,16 @@
         };
     };
 
+    hp.GameObject = function (type, name, properties, onUpdate) {
+        var self = this;
+        self.type = type;
+        self.name = name;
+        self.onUpdate = onUpdate;
+        self.cell = null;
+        self.isVisible = false;
+        self.properties = properties;
+    };
+
     // The HexPixi.Cell object represents one map hex cell.
     hp.Cell = function (rowNo, columnNo, terrainIndex) {
         var self = this;
@@ -55,6 +65,7 @@
         self.inner = null; // If a non-textured cell then this is the PIXI.Graphics of the hex inner, otherwise a PIXI.Sprite.
         self.hex = null; // The parent container of the hex's graphics objects.
         self.isEmpty = null; // The cell is empty if set to true.
+        self.gameObjects = []; // A variable for attaching GameObjects you want (items, people, descriptions).
 
         self.resetGraphics = function () {
             self.terrainIndex = terrainIndex ? terrainIndex : 0;
@@ -102,6 +113,8 @@
                 terrainTypes: [{ name: "empty", color: 0xffffff, isEmpty: true }],
                 // Array of strings that specify the url of a texture. Can be referenced by index in terrainType.
                 textures: [],
+                // An array of GameObjects. These are the players, nps, items, everything other than the map and ui.
+                gameObjects: [],
                 // This is the pixel height specifying an area of overlap for hex cells. Necessary when
                 // working with isometric view art systems.
                 hexBottomPad: 0,
@@ -387,6 +400,34 @@
             return hex;
         }
 
+        function onHexMouseOver(data) {
+            var cell = data.target.p_cell;
+            self.cellHighlighter.position.x = cell.center.x;
+            self.cellHighlighter.position.y = cell.center.y;
+
+            if (self.inCellCount == 0) {
+                self.hexes.addChild(self.cellHighlighter);
+            }
+
+            if (cell.isOver !== true) {
+                cell.isOver = true;
+                self.inCellCount++;
+            }
+        }
+
+        function onHexMouseOut(data) {
+            var cell = data.target.p_cell;
+            if (cell.isOver === true) {
+                self.inCellCount--;
+
+                if (self.inCellCount == 0) {
+                    self.hexes.removeChild(self.cellHighlighter);
+                }
+
+                cell.isOver = false;
+            }
+        }
+
         // A wrapper for createCell that adds interactivity to the individual cells.
         function createInteractiveCell(cell) {
             var hex = createCell(cell);
@@ -394,34 +435,10 @@
             hex.interactive = true;
 
             // set the mouseover callback..
-            hex.mouseover = function (data) {
-                var cell = data.target.p_cell;
-                self.cellHighlighter.position.x = cell.center.x;
-                self.cellHighlighter.position.y = cell.center.y;
-
-                if (self.inCellCount == 0) {
-                    self.hexes.addChild(self.cellHighlighter);
-                }
-
-                if (cell.isOver !== true) {
-                    cell.isOver = true;
-                    self.inCellCount++;
-                }
-            }
+            hex.mouseover = onHexMouseOver;
 
             // set the mouseout callback..
-            hex.mouseout = function (data) {
-                var cell = data.target.p_cell;
-                if (cell.isOver === true) {
-                    self.inCellCount--;
-
-                    if (self.inCellCount == 0) {
-                        self.hexes.removeChild(self.cellHighlighter);
-                    }
-
-                    cell.isOver = false;
-                }
-            }
+            hex.mouseout = onHexMouseOut;
 
             hex.click = function (data) {
                 if (self.options.onHexClick) {
@@ -514,6 +531,7 @@
 
         self.importMap = function (exportedMap) {
             var newOptions = {
+                onHexClick: self.options.onHexClick, // Preserve the hex click callback
                 mapHeight: exportedMap.mapHeight,
                 mapWidth: exportedMap.mapWidth,
                 coordinateSystem: exportedMap.coordinateSystem,
@@ -523,8 +541,6 @@
                 hexHeight: exportedMap.hexHeight,
                 hexBottomPad: exportedMap.hexBottomPad,
                 showCoordinates: exportedMap.showCoordinates,
-                // MLH: Here is a tricky problem, but we can solve with unique namespaces.
-                //onHexClick: onHexClick,
                 textures: JSON.parse(exportedMap.textures),
                 terrainTypes: JSON.parse(exportedMap.terrainTypes)                
             };
@@ -561,8 +577,6 @@
                 hexHeight: self.options.hexHeight,
                 hexBottomPad: self.options.hexBottomPad,
                 showCoordinates: self.options.showCoordinates,
-                // MLH: Here is a tricky problem, but we can solve with unique namespaces.
-                //onHexClick: onHexClick,
                 textures: JSON.stringify(self.options.textures),
                 terrainTypes: JSON.stringify(self.options.terrainTypes),
                 cells: JSON.stringify(self.cells)
