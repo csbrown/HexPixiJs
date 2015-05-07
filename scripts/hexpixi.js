@@ -136,7 +136,7 @@
 
         self.setCellTerrainType = function (cell, terrainIndex) {
             cell.terrainIndex = terrainIndex;
-            createSceneGraph();
+            self.createSceneGraph();
         };
 
         // Creates a hex shaped polygon that is used for the hex's hit area.
@@ -429,7 +429,7 @@
         }
 
         // A wrapper for createCell that adds interactivity to the individual cells.
-        function createInteractiveCell(cell) {
+        self.createInteractiveCell = function(cell) {
             var hex = createCell(cell);
             hex.hitArea = cell.poly;
             hex.interactive = true;
@@ -510,7 +510,7 @@
         };
 
         // Clears the scene graph and recreates it from self.cells.
-        function createSceneGraph() {
+        self.createSceneGraph = function() {
             var cell = null,
                 row = null,
                 rowIndex = 0,
@@ -522,7 +522,7 @@
                 colIndex = 0;
                 while (colIndex < row.length) {
                     cell = row[colIndex];
-                    self.hexes.addChild(createInteractiveCell(cell));
+                    self.hexes.addChild(self.createInteractiveCell(cell));
                     colIndex++;
                 }
                 rowIndex++;
@@ -563,7 +563,7 @@
                 }
             }
 
-            createSceneGraph();
+            self.createSceneGraph();
         };
 
         self.exportMap = function () {
@@ -598,7 +598,7 @@
                     self.cells[cell.row].push(cell);
                 }
             }
-            createSceneGraph();
+            self.createSceneGraph();
         };
 
         self.generateBlankMap = function () {
@@ -613,7 +613,7 @@
                     self.cells[cell.row].push(cell);
                 }
             }
-            createSceneGraph();
+            self.createSceneGraph();
         };
 
         function extend(obj) {
