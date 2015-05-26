@@ -3,9 +3,19 @@
 (function (window) {
     'use strict';
 
-    var MAPSIZE = 14,
-        TILESIZE = 20,
-        BORDERWIDTH = 4,
+    
+
+    var size = {
+      "width": window.innerWidth || document.body.clientWidth,
+      "height": window.innerHeight || document.body.clientHeight
+    };
+
+    var MAPSIZE = 14;
+
+    var maxTileSizeVertical = size["width"]/((MAPSIZE+0.5)*2*Math.sqrt(3)),
+        maxTileSizeHorizontal = size["height"]/(2*MAPSIZE),
+        TILESIZE = Math.min(maxTileSizeVertical, maxTileSizeHorizontal),
+        BORDERWIDTH = TILESIZE/5,
         MAPWIDTH = MAPSIZE * 2 - 1,
         MAPHEIGHT = MAPSIZE;
 
@@ -61,9 +71,22 @@
             turn = (turn == "blue") ? "yellow" : "blue";
             map.hexes.removeChild(cell)
             map.hexes.addChild(map.createInteractiveCell(newCell));
-            //map.createSceneGraph();
         }
     }
+
+    var resizeToScreen = function(event) {
+        var size = {
+          "width": window.innerWidth || document.body.clientWidth,
+          "height": window.innerHeight || document.body.clientHeight
+        };
+        var maxTileSizeVertical = size["width"]/((MAPSIZE+0.5)*2*Math.sqrt(3)),
+            maxTileSizeHorizontal = size["height"]/(2*MAPSIZE),
+            tileSize = Math.min(maxTileSizeVertical, maxTileSizeHorizontal);
+
+        renderer.view.style.height = String(tileSize*MAPSIZE*2) + 'px';
+        renderer.view.style.width = String(tileSize*(MAPSIZE + 0.5)*2*Math.sqrt(3)) + 'px';
+    }
+    window.onresize = resizeToScreen;
 
     function animate() {
         requestAnimFrame(animate);
